@@ -1,0 +1,20 @@
+# Compiled binaries
+tunstdio
+tunstdio_test
+test_hex_codec
+test_ip_parsing
+test_integration
+
+# Object files
+*.o
+
+# Editor files
+*~
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db

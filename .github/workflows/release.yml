@@ -1,0 +1,46 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    name: Build Release
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Install musl-gcc
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y musl-tools musl-dev gcc make linux-libc-dev
+      
+      - name: Build with musl-libc (static)
+        run: |
+          CC=musl-gcc make clean
+          CC=musl-gcc EXTRA_CFLAGS=-static EXTRA_LDFLAGS=-static make all
+      
+      - name: Verify static linking
+        run: |
+          if ldd tunstdio 2>/dev/null; then
+            echo "ERROR: Binary is dynamically linked!"
+            exit 1
+          fi
+          file tunstdio
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: tunstdio
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
